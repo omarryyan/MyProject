@@ -12,21 +12,17 @@ Practice rewrite of a Junior C# / .NET take-home assignment: a bank **Foundation
 
 ### What is / isn’t relevant
 
-| Relevant | Not relevant |
-| -------- | ------------ |
-| Part A code (done), understanding & changing code (defense practice) | Formal grading / weights |
-| Part B `ANSWERS.md` (done) | Timeline / hours spent |
-| `AI_NOTES.md` (done), `README.md` | |
-| Optional polish / deferred TODOs when learner asks | |
+| Relevant                                                            | Not relevant             |
+| ------------------------------------------------------------------- | ------------------------ |
+| Part A–B deliverables (done); understanding & defense-style changes | Formal grading / weights |
+| Optional polish when learner asks                                   | Timeline / hours spent   |
 
 ## How to work with the learner
 
 - Explain requirements; do **not** solve whole steps unless asked.
 - If asked to implement something: do it, then **explain** the C# ideas.
-- Infrastructure / DI / config boilerplate may be done for them with explanation.
-- Core learning pieces: guide first; fill in only when they ask.
-- Stay on **`net11.0`** (assignment says .NET 8; learner chose net11 for practice).
-- Prefer Hebrew explanations only if the learner asks; otherwise English is fine.
+- Stay on **`net11.0`** (chosen for practice; not switching to net8 unless asked).
+- Prefer Hebrew only if the learner asks; otherwise English.
 - **Do not commit or push** unless the learner explicitly asks.
 
 ## Solution layout
@@ -34,64 +30,52 @@ Practice rewrite of a Junior C# / .NET take-home assignment: a bank **Foundation
 ```
 MyProject/
   docs/
-    AGENTS.md                     # this file — always read first
-    event-refactor-guide.md       # historical guide for StateChanged refactor
-  .cursor/rules/
-    bankfoundation-practice.mdc   # alwaysApply coaching rule (points here)
-  README.md                       # run, switch queue, review, design answers
-  ANSWERS.md                      # Part B reliability answers
-  AI_NOTES.md                     # tools + rejected AI suggestion example
+    AGENTS.md
+    event-refactor-guide.md
+  .cursor/rules/bankfoundation-practice.mdc
+  README.md                       # run, review, design answers, “didn’t finish”
+  ANSWERS.md
+  AI_NOTES.md
   BankFoundation.slnx
-  BankFoundation/                 # Console app (Exe), net11.0
-    Program.cs                    # Host + DI + demo
-    MessageSender.cs              # ns BankFoundation; Active/Suspended send
-    appsettings.json              # Queue:Type = Sim | DATQ
-    Queues/                       # ns BankFoundation.Queues
-    Session/                      # ns BankFoundation.Sessions
-    Audit/                        # ns BankFoundation.Audit; FileAudit path hardcoded locally
-  BankFoundation.Tests/           # xUnit
+  BankFoundation/                 # net11.0 Console
+    Program.cs, MessageSender.cs, appsettings.json
+    Queues/, Session/, Audit/
+  BankFoundation.Tests/           # xUnit — Session, MessageSender, QueueConfiguration
 ```
 
-## Assignment status — COMPLETE for core deliverables
+## Assignment status — COMPLETE
 
-| # | Topic | Status |
-| - | ----- | ------ |
-| 1 | Code review (≥4 issues) | Done — README |
-| 2 | Queue interface + DATQ + Simulator | Done |
-| 3 | Config + DI choose queue | Done |
-| 4 | Session states + transitions | Done |
-| 5 | Audit interface + file/in-memory | Done |
-| 6 | xUnit tests (4+) | Done (7 tests) |
-| 7 | Abstract class vs interface | Done — README |
-| 8 | Reconnecting + tests | Done |
-| 9 | Send while Suspended (buffer + flush) | Done |
-| — | Part B ANSWERS.md | Done |
-| — | AI_NOTES.md | Done |
-| — | Sender glue + StateChanged flush | Done |
+| Item                         | Status         |
+| ---------------------------- | -------------- |
+| Part A steps 1–9             | Done           |
+| Part B ANSWERS.md            | Done           |
+| AI_NOTES.md                  | Done           |
+| README (incl. didn’t finish) | Done           |
+| Tests                        | **17** passing |
 
 ## Important design choices
 
-- Queues behind `IMessageQueue`; DI picks Sim/DATQ from `Queue:Type`.
-- Session: enum + transition dictionary; `ChangeState` returns bool; starts `Disconnected`.
-- `Session.StateChanged`; `MessageSender` flushes `_pending` when state becomes `Active`.
-- Suspended `Send` buffers clones up to `MaxPendingCount` (default 100); full buffer → `Send` returns `false`.
-- Pending: flush on `Active`; **clear** on `LoggingOut` / `Disconnected` via `StateChanged`.
-- `FileAudit` uses hardcoded local path `...\Audit\Audits.txt` with `append: true` (intentional for one PC).
-- Host: `ContentRootPath = AppContext.BaseDirectory` for `appsettings.json`.
+- `IMessageQueue` + DI from `Queue:Type` (`Sim` / `DATQ`).
+- Session: enum + transition map; `StateChanged` on success.
+- `MessageSender`: Active → deliver; Suspended → buffer (max **100** default, reject when full); flush on **Active**; clear on **LoggingOut** / **Disconnected**; **Reconnecting** does not clear pending.
+- Audit: `IAuditMessage` → `FileAudit` (hardcoded local `Audits.txt`, append) / `InMemoryAudit`.
+- Namespaces: `BankFoundation`, `.Queues`, `.Sessions`, `.Audit`.
+- Host: `ContentRootPath = AppContext.BaseDirectory`.
 
 ### Optional later (only if learner asks)
 
-- Relative/configurable audit path; more tests as desired.
+- Configurable / relative audit path.
+- DATQ host/user from config.
+- Explicit policy if Suspended → Reconnecting should clear pending.
 
 ## Next likely work
 
-1. Defense practice: explain code / small change without AI.
-2. Commit/push remaining local changes (learner does this).
+1. Defense practice (explain / small change without AI).
+2. Learner commits/pushes local changes when ready.
 
 ## Do not
 
-- Rewrite working learner code without asking.
-- Implement deferred TODOs or extras unsolicited.
-- Change target framework away from `net11.0` unless asked.
-- Treat grading percentages or time estimates as requirements.
-- Commit or push unless the learner explicitly asks.
+- Rewrite working code without asking.
+- Change `net11.0` unless asked.
+- Commit/push unless asked.
+- Treat grading weights or hours as requirements.

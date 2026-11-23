@@ -5,7 +5,7 @@ alwaysApply: true
 
 # BankFoundation practice
 
-Before helping, read `docs/AGENTS.md` (layout, status, coaching rules). Update it when status changes.
+Before helping, read `docs/AGENTS.md`. Update it when status changes.
 
 ## Coaching mode
 - Junior C# practice — understanding first.
@@ -13,10 +13,10 @@ Before helping, read `docs/AGENTS.md` (layout, status, coaching rules). Update i
 - Keep `net11.0`. Do **not** commit/push unless the user asks.
 
 ## Status (summary)
-- Part A (steps 1–9), Part B (`ANSWERS.md`), `AI_NOTES.md`, core README — **done**.
-- Flush on Active via `Session.StateChanged`; clear pending on LoggingOut/Disconnected; max pending size (default 100).
-- Optional: README “didn’t finish”.
+- Part A (1–9), Part B, AI_NOTES, README (incl. didn’t finish) — **done**.
+- **17** tests passing.
+- Pending: flush on Active; clear on LoggingOut/Disconnected; max size 100; Reconnecting keeps pending.
 
 ## Scope
-- Relevant: code understanding, defense-style changes, optional polish when asked.
+- Relevant: defense practice, optional polish when asked.
 - Ignore: formal grading weights and timeline/hours.
