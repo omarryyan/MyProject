@@ -89,8 +89,3 @@ If the session never becomes Active again, messages stay in memory (undelivered,
 
 ## What I didn’t finish / would do differently
 
----
-
-## Time spent _(optional)_
-
-Approx. hours:
