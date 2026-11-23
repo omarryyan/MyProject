@@ -1,0 +1,56 @@
+## Build
+**/bin/
+**/obj/
+**/out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio / VS Code / Cursor
+.vs/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+*.rsuser
+*.DotSettings.user
+
+## NuGet
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nupkg
+**/project.lock.json
+**/project.fragment.lock.json
+
+## Test / coverage
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+coverage*
+*.coverage
+*.coveragexml
+
+## OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## Local / secrets (keep examples if you add them later)
+*.env
+*.env.*
+!*.env.example
+appsettings.*.local.json
+secrets.json
+
+## Logs / local audit output
+*.log
+BankFoundation/Audit/Audits.txt
+BankFoundation/Audit/Audits.txt.txt
+
+## Misc
+*.swp
+*~
+Temp.cs
+
+# Accidental nested folder/repo
+/MyProject/

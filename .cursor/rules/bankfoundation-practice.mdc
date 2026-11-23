@@ -1,0 +1,21 @@
+---
+description: BankFoundation practice project — coaching mode and progress
+alwaysApply: true
+---
+
+# BankFoundation practice
+
+Before coding help, read and follow `docs/AGENTS.md` (progress, layout, coaching rules). Update that file when status changes.
+
+## Coaching mode
+
+- Learner is practicing a Junior C# assignment (understanding first).
+- Guide first; implement fully only when asked, then explain.
+- Do not solve upcoming steps unsolicited.
+- Keep `net11.0`.
+
+## Scope
+
+- Relevant: Part A, Part B, README, AI_NOTES, ability to change/explain code — do when learner is ready.
+- Ignore only: formal grading weights and timeline/hours.
+- Current focus: Part B ANSWERS.md / AI_NOTES.md; deferred TODO: pending buffer if Suspended never returns to Active.
