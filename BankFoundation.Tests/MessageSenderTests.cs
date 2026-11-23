@@ -75,4 +75,49 @@ public class MessageSenderTests
         Assert.Equal(payload, queue.Messages[0]);
         Assert.Single(audit.Entries);
     }
+
+    [Fact]
+    public void Send_WhenSuspended_AndBufferFull_Rejects()
+    {
+        var session = new Session();
+        var queue = new SimulatorMessageQueue();
+        var audit = new InMemoryAudit();
+        var sender = new MessageSender(session, queue, audit, maxPendingCount: 2);
+
+        ReachSuspended(session);
+
+        Assert.True(sender.Send(Encoding.UTF8.GetBytes("1")));
+        Assert.True(sender.Send(Encoding.UTF8.GetBytes("2")));
+        Assert.False(sender.Send(Encoding.UTF8.GetBytes("3")));
+        Assert.Equal(2, sender.PendingCount);
+        Assert.Empty(queue.Messages);
+    }
+
+    [Fact]
+    public void Pending_Cleared_WhenLeavingSuspendedToLoggingOut()
+    {
+        var session = new Session();
+        var queue = new SimulatorMessageQueue();
+        var audit = new InMemoryAudit();
+        var sender = new MessageSender(session, queue, audit);
+
+        ReachSuspended(session);
+        Assert.True(sender.Send(Encoding.UTF8.GetBytes("will-be-dropped")));
+        Assert.Equal(1, sender.PendingCount);
+
+        Assert.True(session.ChangeState(SessionState.LoggingOut));
+
+        Assert.Equal(0, sender.PendingCount);
+        Assert.Empty(queue.Messages);
+        Assert.Empty(audit.Entries);
+    }
+
+    private static void ReachSuspended(Session session)
+    {
+        session.ChangeState(SessionState.Connecting);
+        session.ChangeState(SessionState.LoggingIn);
+        session.ChangeState(SessionState.Active);
+        session.ChangeState(SessionState.Suspended);
+    }
 }
+

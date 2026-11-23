@@ -77,15 +77,20 @@ Three main places in production code: (1) `SessionState` enum — add `Reconnect
 ## Step 9 — Send while Suspended
 
 **Chosen behavior:**  
-While `Suspended`, `Send` **buffers** a copy of the message in memory (does not hit the queue/audit yet). When the session returns to `Active` via `Session.ChangeState`, `Session` raises `StateChanged`; `MessageSender` listens and **flushes** the buffer (each message is sent to the queue and audited, in order).
+While `Suspended`, `Send` **buffers** a copy of the message in memory (up to `MaxPendingCount`, default 100). When the session returns to `Active`, `StateChanged` triggers a **flush** (queue + audit, in order). If the session goes to **LoggingOut** or **Disconnected**, the pending buffer is **cleared** (messages discarded). If the buffer is full while still Suspended, further `Send`s return `false` (backpressure).
 
 **Why:**  
-Suspended is a pause, not a disconnect — work may still arrive and should not be silently lost. Buffering preserves messages until trading/sending is allowed again.
+Suspended is a pause, not a disconnect — short-term work should not be silently lost. A max size and clear-on-logout keep memory bounded and avoid orphaned messages after the session ends.
 
 **Downside:**  
-If the session never becomes Active again, messages stay in memory (undelivered, memory can grow). A fuller design would add timeout, alerting, or clearing the buffer on logout/disconnect.
+Messages discarded on logout/disconnect (or rejected when the buffer is full) are not delivered; callers must handle `false` / possible loss. In-memory buffer is still lost if the process crashes while Suspended.
 
 ---
 
 ## What I didn’t finish / would do differently
+
+- **Audit file path** is hardcoded for my machine (`FileAudit`). I’d move it to `appsettings.json` (or a path under the app directory) so it runs cleanly on any PC.
+- **DATQ connection settings** aren’t loaded from config (we only select queue type). The fake DATQ has no secrets in code, but a fuller version would bind host/user from configuration.
+- **Pending buffer** is in-memory only: a process crash while `Suspended` still loses buffered messages. A production design might use a durable store and/or timeouts.
+- **Suspended → Reconnecting** does not clear or flush pending (only Active flushes; LoggingOut/Disconnected clears). I’d document or decide that edge case explicitly if reconnect flows become common.
 

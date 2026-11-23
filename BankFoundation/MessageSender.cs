@@ -7,26 +7,39 @@ namespace BankFoundation;
 /// <summary>
 /// Coordinates session rules + queue + audit.
 /// Active: send + audit immediately.
-/// Suspended: buffer messages; flush when Session becomes Active (via StateChanged event).
+/// Suspended: buffer up to <see cref="MaxPendingCount"/>; flush on Active;
+/// clear on LoggingOut / Disconnected.
 /// Other states: reject the send.
 /// </summary>
 public class MessageSender
 {
+    public const int DefaultMaxPendingCount = 100;
+
     private readonly Session _session;
     private readonly IMessageQueue _queue;
     private readonly IAuditMessage _audit;
     private readonly Queue<byte[]> _pending = new();
 
-    public MessageSender(Session session, IMessageQueue queue, IAuditMessage audit)
+    public MessageSender(
+        Session session,
+        IMessageQueue queue,
+        IAuditMessage audit,
+        int maxPendingCount = DefaultMaxPendingCount)
     {
+        if (maxPendingCount < 1)
+            throw new ArgumentOutOfRangeException(nameof(maxPendingCount));
+
         _session = session;
         _queue = queue;
         _audit = audit;
+        MaxPendingCount = maxPendingCount;
 
         _session.StateChanged += OnSessionStateChanged;
     }
 
     public Session Session => _session;
+
+    public int MaxPendingCount { get; }
 
     public int PendingCount => _pending.Count;
 
@@ -35,6 +48,12 @@ public class MessageSender
         if (newState == SessionState.Active)
         {
             FlushPending();
+            return;
+        }
+
+        if (newState is SessionState.LoggingOut or SessionState.Disconnected)
+        {
+            ClearPending();
         }
     }
 
@@ -44,6 +63,11 @@ public class MessageSender
 
         if (_session.State == SessionState.Suspended)
         {
+            if (_pending.Count >= MaxPendingCount)
+            {
+                return false; // backpressure — buffer full
+            }
+
             _pending.Enqueue((byte[])message.Clone());
             return true;
         }
@@ -64,6 +88,11 @@ public class MessageSender
         {
             Deliver(_pending.Dequeue());
         }
+    }
+
+    private void ClearPending()
+    {
+        _pending.Clear();
     }
 
     private void Deliver(byte[] message)

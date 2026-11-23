@@ -14,8 +14,8 @@ Before helping, read `docs/AGENTS.md` (layout, status, coaching rules). Update i
 
 ## Status (summary)
 - Part A (steps 1–9), Part B (`ANSWERS.md`), `AI_NOTES.md`, core README — **done**.
-- Flush on Active via `Session.StateChanged` (not `MessageSender.ChangeState`).
-- Deferred: pending buffer if Suspended never returns to Active; optional README “didn’t finish”.
+- Flush on Active via `Session.StateChanged`; clear pending on LoggingOut/Disconnected; max pending size (default 100).
+- Optional: README “didn’t finish”.
 
 ## Scope
 - Relevant: code understanding, defense-style changes, optional polish when asked.
