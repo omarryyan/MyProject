@@ -7,15 +7,17 @@ public class InMemoryAudit : IAuditMessage
 
     public IReadOnlyList<AuditEntry> Entries => _entries;
 
-    public void Record(byte[] message)
+    public void Record(byte[] message, string queueType)
     {
         ArgumentNullException.ThrowIfNull(message);
+        ArgumentException.ThrowIfNullOrWhiteSpace(queueType);
 
         _entries.Add(new AuditEntry(
             DateTime.UtcNow,
             message.Length,
             _sequence,
-            (byte[])message.Clone()));
+            (byte[])message.Clone(),
+            queueType));
 
         _sequence++;
     }

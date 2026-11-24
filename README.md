@@ -17,14 +17,19 @@ Edit `BankFoundation/appsettings.json`:
 ```json
 {
   "Queue": {
-    "Type": "Sim"
+    "Type": "Sim",
+    "Datq": {
+      "Host": "AS400-SIM",
+      "User": "foundation",
+      "Password": "local-dev-only"
+    }
   }
 }
 ```
 
-Use `"Sim"` or `"DATQ"`. No code change needed — DI picks the implementation at startup.
+Use `"Sim"` or `"DATQ"` for `Type`. No code change needed — DI picks the implementation at startup.
 
-For DATQ, connection details live under `Queue:Datq` (Host, User, Password). They are **read from config** and used only by the fake client (e.g. logged); **no real AS/400 connection** is opened. Change those values in `appsettings.json` without editing C#.
+`Queue:Datq` (Host, User, Password) is bound into `DatqOptions` and used only by the fake DATQ client (e.g. logged); **no real AS/400 connection** is opened. Audit lines also record which queue was used (`queue=Sim` or `queue=DATQ`).
 
 ---
 

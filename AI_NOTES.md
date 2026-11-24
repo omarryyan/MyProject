@@ -24,5 +24,5 @@ I preferred a **`Session.StateChanged` event**: `Session` stays the only place t
 
 ## Other notes
 
-- I also pushed back on keeping `DatqOptions` after an AI polish pass — removed it to keep the DATQ fake simple for this practice project.
+- Early on I removed `DatqOptions` to keep DATQ simple; later I **brought it back** so connection details come from `appsettings.json` (`Queue:Datq`) while still not opening a real AS/400 connection — matching the assignment wording.
 - Assignment answers (code review, Part B) were drafted from my own reasoning; AI helped with wording/structure where useful.

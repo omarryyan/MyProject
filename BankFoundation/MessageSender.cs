@@ -98,6 +98,14 @@ public class MessageSender
     private void Deliver(byte[] message)
     {
         _queue.Send(message);
-        _audit.Record(message);
+        _audit.Record(message, ResolveQueueTypeName());
     }
+
+    private string ResolveQueueTypeName() => _queue switch
+    {
+        DatqMessageQueue => "DATQ",
+        SimulatorMessageQueue => "Sim",
+        _ => _queue.GetType().Name
+    };
 }
+

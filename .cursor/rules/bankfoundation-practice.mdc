@@ -14,7 +14,9 @@ Before helping, read `docs/AGENTS.md`. Update it when status changes.
 
 ## Status (summary)
 - Part A (1–9), Part B, AI_NOTES, README (incl. didn’t finish) — **done**.
-- **17** tests passing.
+- **18** tests passing.
+- `DatqOptions` from `Queue:Datq` (fake DATQ; no real connection).
+- Audit records queue type (`Sim` / `DATQ`).
 - Pending: flush on Active; clear on LoggingOut/Disconnected; max size 100; Reconnecting keeps pending.
 
 ## Scope

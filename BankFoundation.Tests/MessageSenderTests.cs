@@ -44,6 +44,7 @@ public class MessageSenderTests
         Assert.Single(audit.Entries);
         Assert.Equal(payload.Length, audit.Entries[0].MessageLength);
         Assert.Equal(1, audit.Entries[0].Sequence);
+        Assert.Equal("Sim", audit.Entries[0].QueueType);
     }
 
     [Fact]

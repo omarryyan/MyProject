@@ -39,7 +39,9 @@ MyProject/
   BankFoundation.slnx
   BankFoundation/                 # net11.0 Console
     Program.cs, MessageSender.cs, appsettings.json
-    Queues/, Session/, Audit/
+    Queues/   # IMessageQueue, Sim, Datq + DatqOptions
+    Session/  # Session, SessionState
+    Audit/    # IAuditMessage, FileAudit, InMemoryAudit, AuditEntry
   BankFoundation.Tests/           # xUnit — Session, MessageSender, QueueConfiguration
 ```
 
@@ -51,7 +53,7 @@ MyProject/
 | Part B ANSWERS.md            | Done           |
 | AI_NOTES.md                  | Done           |
 | README (incl. didn’t finish) | Done           |
-| Tests                        | **17** passing |
+| Tests                        | **18** passing |
 
 ## Important design choices
 
@@ -59,7 +61,7 @@ MyProject/
 - `DatqOptions` bound from `Queue:Datq` (Host/User/Password); `DatqMessageQueue` fakes a write using those values — no real connection.
 - Session: enum + transition map; `StateChanged` on success.
 - `MessageSender`: Active → deliver; Suspended → buffer (max **100** default, reject when full); flush on **Active**; clear on **LoggingOut** / **Disconnected**; **Reconnecting** does not clear pending.
-- Audit: `IAuditMessage` → `FileAudit` (hardcoded local `Audits.txt`, append) / `InMemoryAudit`.
+- Audit: `IAuditMessage.Record(message, queueType)` → `FileAudit` / `InMemoryAudit` (UTC, length, seq, queue Sim|DATQ).
 - Namespaces: `BankFoundation`, `.Queues`, `.Sessions`, `.Audit`.
 - Host: `ContentRootPath = AppContext.BaseDirectory`.
 

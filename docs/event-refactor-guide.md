@@ -1,4 +1,6 @@
-# Guide: Session event → flush buffer (you implement)
+# Guide: Session event → flush buffer (historical)
+
+**Status:** Completed. Kept for learning context. Current code uses `Session.StateChanged` (no `MessageSender.ChangeState`).
 
 No new `.cs` files needed. Change these four places.
 
