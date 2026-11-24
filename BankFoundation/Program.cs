@@ -13,6 +13,9 @@ var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
     ContentRootPath = AppContext.BaseDirectory
 });
 
+// Bind Queue:Datq → DatqOptions (host/user/password from config, not hardcoded in C#)
+builder.Services.Configure<DatqOptions>(builder.Configuration.GetSection(DatqOptions.SectionName));
+
 // Read Queue:Type from appsettings.json (e.g. "Sim" or "DATQ")
 var queueType = builder.Configuration["Queue:Type"];
 

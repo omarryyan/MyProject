@@ -56,6 +56,7 @@ MyProject/
 ## Important design choices
 
 - `IMessageQueue` + DI from `Queue:Type` (`Sim` / `DATQ`).
+- `DatqOptions` bound from `Queue:Datq` (Host/User/Password); `DatqMessageQueue` fakes a write using those values — no real connection.
 - Session: enum + transition map; `StateChanged` on success.
 - `MessageSender`: Active → deliver; Suspended → buffer (max **100** default, reject when full); flush on **Active**; clear on **LoggingOut** / **Disconnected**; **Reconnecting** does not clear pending.
 - Audit: `IAuditMessage` → `FileAudit` (hardcoded local `Audits.txt`, append) / `InMemoryAudit`.
@@ -65,8 +66,8 @@ MyProject/
 ### Optional later (only if learner asks)
 
 - Configurable / relative audit path.
-- DATQ host/user from config.
 - Explicit policy if Suspended → Reconnecting should clear pending.
+- Move DATQ password out of committed appsettings (user secrets / env).
 
 ## Next likely work
 

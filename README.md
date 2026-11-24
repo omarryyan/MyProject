@@ -24,6 +24,8 @@ Edit `BankFoundation/appsettings.json`:
 
 Use `"Sim"` or `"DATQ"`. No code change needed — DI picks the implementation at startup.
 
+For DATQ, connection details live under `Queue:Datq` (Host, User, Password). They are **read from config** and used only by the fake client (e.g. logged); **no real AS/400 connection** is opened. Change those values in `appsettings.json` without editing C#.
+
 ---
 
 ## Step 1 — Code review (sample `ChannelManager`)
@@ -90,7 +92,7 @@ Messages discarded on logout/disconnect (or rejected when the buffer is full) ar
 ## What I didn’t finish / would do differently
 
 - **Audit file path** is hardcoded for my machine (`FileAudit`). I’d move it to `appsettings.json` (or a path under the app directory) so it runs cleanly on any PC.
-- **DATQ connection settings** aren’t loaded from config (we only select queue type). The fake DATQ has no secrets in code, but a fuller version would bind host/user from configuration.
 - **Pending buffer** is in-memory only: a process crash while `Suspended` still loses buffered messages. A production design might use a durable store and/or timeouts.
+- **DATQ password in appsettings.json** is fine for local practice; in production I’d use user secrets / environment variables / a secret store, not a committed config file.
 - **Suspended → Reconnecting** does not clear or flush pending (only Active flushes; LoggingOut/Disconnected clears). I’d document or decide that edge case explicitly if reconnect flows become common.
 

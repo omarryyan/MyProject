@@ -2,6 +2,7 @@ using BankFoundation.Queues;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace BankFoundation.Tests;
 
@@ -26,6 +27,17 @@ public class QueueConfigurationTests
         Assert.Throws<InvalidOperationException>(() => BuildHostWithQueueType("Nope"));
     }
 
+    [Fact]
+    public void DatqOptions_AreBoundFromConfiguration()
+    {
+        var host = BuildHostWithQueueType("DATQ");
+        var options = host.Services.GetRequiredService<IOptions<DatqOptions>>().Value;
+
+        Assert.Equal("AS400-TEST", options.Host);
+        Assert.Equal("test-user", options.User);
+        Assert.Equal("test-secret", options.Password);
+    }
+
     private static IHost BuildHostWithQueueType(string queueType)
     {
         var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
@@ -35,8 +47,13 @@ public class QueueConfigurationTests
 
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Queue:Type"] = queueType
+            ["Queue:Type"] = queueType,
+            ["Queue:Datq:Host"] = "AS400-TEST",
+            ["Queue:Datq:User"] = "test-user",
+            ["Queue:Datq:Password"] = "test-secret"
         });
+
+        builder.Services.Configure<DatqOptions>(builder.Configuration.GetSection(DatqOptions.SectionName));
 
         var configuredType = builder.Configuration["Queue:Type"];
         if (string.Equals(configuredType, "DATQ", StringComparison.OrdinalIgnoreCase))
